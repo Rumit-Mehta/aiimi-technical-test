@@ -7,5 +7,15 @@
     border-radius: 10px;
     margin-top: 1rem;
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 25px;
+    padding: 0 15px;
+    box-shadow: 0px 0px 8px;
+    display: flex;
+    position: relative;
+}
+
+.results-list:hover{
+    border: 1px solid #e7225C;
 }

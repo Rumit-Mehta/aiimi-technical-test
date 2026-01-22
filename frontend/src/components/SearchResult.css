@@ -1,7 +1,3 @@
 .search-result {
     padding: 10px 2px;
 }
-
-.search-result:hover {
-    background-color: blueviolet;
-}
