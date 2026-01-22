@@ -49,8 +49,8 @@ def search_users(name: str = ""):
     db = Session()
     results = db.query(User).filter(
         or_(
-            User.first_name.ilike(f"%{q}%"),
-            User.last_name.ilike(f"%{q}%"),
+            User.first_name.ilike(f"%{name}%"),
+            User.last_name.ilike(f"%{name}%"),
         )
     ).all()
     db.close()
