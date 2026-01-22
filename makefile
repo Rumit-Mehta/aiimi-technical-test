@@ -7,6 +7,9 @@ FRONTEND_PORT ?= 5173
 
 setup: 
 	python -m pip install -r backend/requirements.txt
+	@echo "Seeding DB from Excel..."
+	@.venv/bin/python backend/scripts/add_test_data.py
+	@echo "Setup complete."
 
 backend-run: backend-install
 	@echo "Starting backend on http://localhost:$(BACKEND_PORT)"
