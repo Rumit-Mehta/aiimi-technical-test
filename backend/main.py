@@ -3,7 +3,8 @@ import re
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import Column, Integer, String, create_engine, UniqueConstraint, or_
 from sqlalchemy.orm import sessionmaker, declarative_base
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # Initialise db 
@@ -40,8 +41,21 @@ class UserIn(BaseModel):
 #  - - API - - 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 @app.get("/users")
-def search_users(name: str = ""):
+def search_users(name: str = Query("", alias="q")):
+    
     # Spec: only suggest after 2 chars
     if len(name.strip()) < 2:
         return []
