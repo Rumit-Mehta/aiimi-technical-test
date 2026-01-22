@@ -11,7 +11,7 @@
     border: 1px solid #e7225C;
 }
 
-input {
+.search-input {
 
     background-color: transparent;
     border: none;
@@ -26,7 +26,7 @@ input:focus {
     outline: none;
 }
 
-button {
+.search-button {
     position: absolute;
     right: 0px;
     top: 0px;
