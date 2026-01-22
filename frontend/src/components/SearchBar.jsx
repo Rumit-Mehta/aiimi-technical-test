@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import "./SearchBar.css";
 
-export const SearchBar = ({ setResults }) => {
+export const SearchBar = ({ setResults, setQuery }) => {
   const [input, setInput] = useState("");
   const debounceRef = useRef(null);
 
@@ -27,6 +27,7 @@ export const SearchBar = ({ setResults }) => {
 
   const handleChange = (value) => {
     setInput(value);
+    setQuery(value);
 
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
