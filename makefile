@@ -23,7 +23,7 @@ dev:
 	@set -e
 	@echo "Starting both servers (backend: $(BACKEND_PORT), frontend: $(FRONTEND_PORT))"
 	@trap 'echo "Stopping..."; kill 0' INT TERM
-	@$(PYTHON) -m uvicorn backend.main:app --reload --host 127.0.0.1 --port $(BACKEND_PORT) &
+	@@.venv/bin/python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port $(BACKEND_PORT) &
 	@cd frontend && npm run dev -- --port $(FRONTEND_PORT) &
 	@wait
 
