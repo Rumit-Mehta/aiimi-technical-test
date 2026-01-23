@@ -12,6 +12,7 @@ function App() {
   const [results, setResults] = useState([]);
   const [selectedResults, setSelectedResults] = useState([]);
   const [isNewUserOpen, setIsNewUserOpen] = useState(false);
+  const [toast, setToast] = useState("");
   const handleSelect = (user) => {
   setSelectedResults(prev => {
     // if user already exists, do nothing
@@ -27,19 +28,34 @@ function App() {
   return (
     <div className='App'>
       <div className='search-bar-container'>
-        <SearchBar setResults={setResults} setQuery={setQuery} />
-        <SearchResultsList results={results} onSelect={handleSelect} query={query} />
+        <SearchBar 
+          setResults={setResults} 
+          setQuery={setQuery} 
+        />
+        <SearchResultsList 
+        results={results} 
+        onSelect={handleSelect} 
+        query={query} 
+        />
         <div className="result-cards">
           {selectedResults.map((user, index) => (
-            <ResultCard key={`${user.id ?? "user"}-${index}`} result={user} />
+            <ResultCard 
+            key={`${user.id ?? "user"}-${index}`} 
+            result={user} />
           ))}
         </div>
         <NewUserForm
           isOpen={isNewUserOpen}
           onClose={() => setIsNewUserOpen(false)}
+            onCreated={(createdUser) => {
+              setIsNewUserOpen(false);
+              setToast("New user added!");
+              setTimeout(() => setToast(""), 2200);
+            }}
         />
         <NewUserBar onNewUser={() => setIsNewUserOpen(true)} /> 
     </div>
+    {toast && <div className="toast">{toast}</div>}
   </div>
   )
 }

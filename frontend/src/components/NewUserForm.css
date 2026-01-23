@@ -9,11 +9,12 @@
     align-items: stretch;
     position: relative;
     border: 1px solid #e7225C;
+    margin-top: 20px;
 }
 
 .new-user-input {
     width: 100%;
-    height: 50px;
+    height: 2.5rem;
     padding: 0 20px;
     border-radius: 999px;
     border: 2px solid rgba(0, 0, 0, 0.25);
@@ -55,4 +56,21 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
+}
+
+.new-user-error {
+    margin: 8px 0 6px;
+    padding: 10px 14px;
+
+    border-radius: 12px;
+    border: 1px solid rgba(231, 34, 92, 0.35);
+    background: rgba(231, 34, 92, 0.10);
+
+    color: #b00020;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+
+    max-width: 100%;
+    word-break: break-word;
 }

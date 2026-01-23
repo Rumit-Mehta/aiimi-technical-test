@@ -1,8 +1,9 @@
 from pathlib import Path
 import re
 from pydantic import BaseModel, EmailStr
-from sqlalchemy import Column, Integer, String, create_engine, UniqueConstraint, or_
+from sqlalchemy import Column, Integer, String, create_engine, UniqueConstraint, or_, and_
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.exc import IntegrityError
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,8 +16,7 @@ engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
-# User Modal
-
+# Creating User table
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -38,7 +38,7 @@ class UserIn(BaseModel):
 
 
 
-#  - - API - - 
+#  - - API Endpoints - - 
 app = FastAPI()
 
 app.add_middleware(
@@ -82,20 +82,42 @@ def get_user(uid: int):
 
 @app.post("/users", status_code=201)
 def create_user(user: UserIn):
-    phone = user.phone.strip()
-    if not re.match(r"^(?:07|\\+44\\s?7)", phone):
-        raise HTTPException(status_code=400, detail="Invalid phone")
+    payload = user.model_dump()
+
+    # Validate phone (UK mobile)
+    if not re.match(r"^(?:07\d{9}|\+44\s?7\d{9})$", payload["phone"]):
+        raise HTTPException(status_code=400, detail="phone: invalid UK mobile number")
 
     db = Session()
     try:
-        u = User(**user.model_dump())
+        # Make duplicate reasons explicit
+        if db.query(User).filter(User.email == payload["email"]).first():
+            raise HTTPException(status_code=409, detail="email already exists")
+
+        if db.query(User).filter(
+            and_(User.first_name == payload["first_name"], User.last_name == payload["last_name"])
+        ).first():
+            raise HTTPException(status_code=409, detail="name already exists")
+
+        u = User(**payload)
         db.add(u)
         db.commit()
         db.refresh(u)
         return u
-    except Exception:
+
+    # Error handling
+    except HTTPException:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Duplicate user rejected")
+        raise
+
+    except IntegrityError:
+        # Catch any remaining uniqueness issue
+        db.rollback()
+        raise HTTPException(status_code=409, detail="duplicate violates unique constraint")
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"create failed: {type(e).__name__}: {e}")
+
     finally:
         db.close()
-
