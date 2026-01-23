@@ -1,0 +1,13 @@
+.search-result {
+    padding: 10px 20px;
+}
+
+.search-result:hover {
+    background-color: #e7225d0f;
+    color: black;
+}
+
+.highlight {
+  background: #ffe66a;
+  border-radius: 3px;
+}
