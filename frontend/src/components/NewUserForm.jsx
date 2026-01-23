@@ -48,7 +48,7 @@ export const NewUserForm = ({ isOpen = false, onClose, onCreated }) => {
     setIsSubmitting(true);
 
     try {
-      // Assumes your FastAPI backend supports POST /users
+
       const res = await fetch("http://localhost:8000/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -56,8 +56,40 @@ export const NewUserForm = ({ isOpen = false, onClose, onCreated }) => {
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Failed to create user");
+        //  FastAPI validation into a readable message
+        let message = "Failed to create user.";
+
+        try {
+          const errJson = await res.json();
+          const detail = errJson?.detail;
+
+        // getting message from error payload
+          if (Array.isArray(detail) && detail.length > 0) {
+            const first = detail[0];
+            const loc = Array.isArray(first?.loc) ? first.loc : [];
+            const field = loc.length ? loc[loc.length - 1] : null;
+            const msg = first?.msg;
+
+            if (field && msg) {
+              message = `${String(field)}: ${String(msg)}`;
+            } else if (msg) {
+              message = String(msg);
+            }
+          } else if (typeof detail === "string") {
+            message = detail;
+          } else if (typeof errJson?.message === "string") {
+            message = errJson.message;
+          }
+        } catch {
+          // Fallback: attempt plain text
+          try {
+            const text = await res.text();
+            if (text) message = text;
+          } catch {
+          }
+        }
+
+        throw new Error(message);
       }
 
       const created = await res.json();
