@@ -60,15 +60,13 @@ def search_users(name: str = Query("", alias="q")):
     if len(name.strip()) < 2:
         return []
 
-    db = Session()
-    results = db.query(User).filter(
-        or_(
-            User.first_name.ilike(f"%{name}%"),
-            User.last_name.ilike(f"%{name}%"),
-        )
-    ).all()
-    db.close()
+    with Session() as db:
+        results = db.query(User).filter(
+            (User.first_name + " " + User.last_name).ilike(f"%{name}%"),
+        ).all()
     return results
+
+
 
 
 @app.get("/users/{uid}")
